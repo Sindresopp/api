@@ -1,0 +1,231 @@
+[
+    {"ATC_VNR": ""},
+    {"ATC_kode": ""},
+    {"Bruker_ID": 1},
+    {"VersjonsNr": ""},  
+    {"Dato": ""},
+    {"Internt_Godkjent": true},
+    {"Eksternt_Godkjent": true},
+    {"Aktivt": true},
+    {"Bruker_ID_A": 2},
+    {"Blandekortdata":[
+        
+            {"Preparat1": 
+                {
+                "Handelsnavn": "Ketalar",
+                "Tillegg": ""
+                }
+            },
+            {"Preparat2":
+                {
+                "Handelsnavn": "Ketamin",
+                "Tillegg": "Abcur"
+                }},
+            {"Styrke1":
+                {
+                "Volum":10,
+                "Malleenhet":"mg/ml",
+                "Form": "inj.væske",
+                "Beholder": ["Ampulle","Hettglass"],
+                "Stamløsning": {"Stamvolum":10,
+                                "Stammaaleenhet": "Mg/ml",
+                                "Stamfrase":"hei stamløsning"
+                                },
+                "Konsentrasjon": "10 mg/ml"
+                }
+            },
+            {"Styrke2":
+                {
+                "Volum":50,
+                "Malleenhet":"mg/ml",
+                "Form": "inj.væske",
+                "Beholder": ["Ampulle","Hettglass"],
+                "Stamløsning": {"Stamvolum":10,
+                                "Stammaaleenhet": "Mg/ml",
+                                "Stamfrase":"hei stamløsning"
+                                },
+                "Konsentrasjon": "50 mg/ml"
+                }
+            },
+            {"Styrkefraser":
+                {
+                "Frase1": "Frase1",
+                "Frase2": "Frase2"
+                }
+            },
+            {"Videre fortynning":
+                {"Ufortynnet": true,
+                 "fortynnes": true,
+                 "Fortynningsvæske":"NaCl 9 mg/ml",
+                 "Konsentrasjon": {
+                     "Frase": "Anbefalt makskonsentrasjon v/ perifer administrasjon",
+                     "volum": "10 mg/ml"
+                    },
+                 "Tillegsfraser": {
+                     "Frase1": "Hei"
+                    }
+                }
+                
+            },
+            {"Videre_fortynning_fraser": {
+                "Frase1": "",
+                "Frase2": "",
+                "Frase3": ""
+                }
+            },
+            {"Administrasjon": {
+                "Admin1": {
+                    "Metode": "IV injeksjon",
+                    "Metodetillegg": "Over minst 1 minutt"
+                    },
+                "Admin2": {
+                    "Metode": "Kontinuerlig IV infusjon",
+                    "Metodetillegg": "Etter legens ordinasjon"
+                    },
+                "Tilleggsfrase": "Kan gis IM"
+                }
+            },
+            {"Admin_fraser":{
+                "Frase1":"",
+                "Frase2": "",
+                "Frase3": ""
+                }
+            },
+            {"Holdbarhet":{
+                "Form1": {
+                    "Form": "Ampulle",
+                    "Oppbevaring": "Engangsbruk"
+                    },
+                "Form2": {
+                    "Form": "Anbrutt hetteglass",
+                    "Oppbevaring": "7 dager i RT"
+                    },
+                "Form3": {
+                    "Form": "Kontinuerlig infusjon",
+                    "Oppbevaring": "24 timer i RT"
+                    }
+                }
+
+            },
+            {"Holdbarhet_frase":{
+                "Frase1": "",
+                "Frase2": "",
+                "Frase3": ""
+                }
+
+            },
+            {"Merknader": {
+                "Tromboflebitt": true,
+                "Antidot": {
+                    "true/false": true,
+                    "Tekst": "Fritekst"
+                    },
+                "Bivirkninger":["Depresjon","Hallusinasjoner"],
+                "Monitorering": ["respirasjon","blodtrykk"]
+                }
+            },
+            {"Merknader_fraser":{
+                "Frase1":"",
+                "Frase2":"",
+                "Frase3": ""
+                }
+            },
+            {"Tilleggsopplysninger":{
+                "Stjerneanmerkning": "",
+                "Fritekst": "",
+                "Y-settforlikelige_væsker": "En frase"
+                }
+            },
+            {"Tilleggs_fraser":{
+                "Frase1": "",
+                "Frase2": "",
+                "Frase3": ""
+                }
+            },
+            {"Bunntekst":{
+                "Standard":"Blandekort til barn",
+                "Kilder": "Se egen referanseliste",
+                "Sist endret": "Dato",
+                "Versjon": "3.0"
+                }
+            }
+        
+    ]},
+    {"Fortynning": [
+        
+           { "Fortynning1":{
+                "Metode": "Injeksjon",
+                "Kommentar":"Ordinert dose etter vekt barn",
+                "Til":"Barn"
+                }
+           },    
+            {"Fortynning2":{
+                "Metode": "Kontinuerlig infusjon",
+                "Forslag_til_virkestoff": {
+                    "rad1":{
+                        "fortynning til":"5mg/ml",
+                        "totalvolum": "20 ml",
+                        "preparatvolum": "10 ml",
+                        "fortynningsvæske": "10 ml",
+                        "preparat":"ketamin 10 mg/ml"
+
+                    },
+                    "rad2":{
+                        "fortynning til":"5mg/ml",
+                        "totalvolum": "50 ml",
+                        "preparatvolum": "25 ml",
+                        "fortynningsvæske": "25 ml",
+                        "preparat":"ketamin 10 mg/ml"
+
+                    },
+                    "rad3":{
+                        "fortynning_til": "10 mg/ml",
+                        "totalvolum": "20 ml",
+                        "preparatvolum": "4 ml",
+                        "fortynningsvæske": "16 ml",
+                        "preparat": "ketamin 50 mg/ml"
+                    },
+                    "rad4":{
+                        "fortynning_til": "10 mg/ml",
+                        "totalvolum": "50 ml",
+                        "preparatvolum": "10 ml",
+                        "fortynningsvæske": "40 ml",
+                        "preparat": "ketamin 50 mg/ml"
+                    } 
+                },
+                "Til": "Barn"
+              }
+            },
+            {"Fortynning3": {
+                "til": "Nyfødt",
+                "Metode": "",
+                "Forslag_til_virkestoff": {
+                    "rad1":{
+                        "fortynning til":"5mg/ml",
+                        "totalvolum": "10 ml",
+                        "preparatvolum": "5 ml",
+                        "fortynningsvæske": "5 ml",
+                        "preparat":"ketamin 10 mg/ml"
+
+                    },
+                    "rad2":{
+                        "fortynning til":"5mg/ml",
+                        "totalvolum": "10 ml",
+                        "preparatvolum": "1 ml",
+                        "fortynningsvæske": "9 ml",
+                        "preparat":"ketamin 50 mg/ml"
+
+                    },
+                    "rad3":{
+                        "fortynning_til": "10 mg/ml",
+                        "totalvolum": "10 ml",
+                        "preparatvolum": "2 ml",
+                        "fortynningsvæske": "8 ml",
+                        "preparat": "ketamin 50 mg/ml"
+                    }
+                }
+              }
+            }   
+        
+    ]}
+]

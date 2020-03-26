@@ -1,0 +1,26 @@
+[
+
+    { "id": 1, 
+      "firstName": "Sindre", 
+      "lastName": "Lande", 
+      "email": "sindersopp@hotmail.com",
+      "phone": "94192124",
+      "city": "Trondheim" 
+    },
+
+    { "id": 2, 
+      "firstName": "Henrik", 
+      "lastName": "Hodne", 
+      "email": "Hehod@hotmail.com",
+      "phone": "43337980",
+      "city": "Trondheim" 
+      },
+
+      { "id": 3, 
+        "firstName": "Jonas", 
+        "lastName": "Joe", 
+        "email": "joe@hotmail.com",
+        "phone": "90672819",
+        "city": "Trondheim" 
+        }
+]

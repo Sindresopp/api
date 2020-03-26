@@ -1,0 +1,211 @@
+[
+  {"ATC_VNR": ""},
+  {"ATC_kode": ""},
+  {"Bruker_ID": 1},
+  {"VersjonsNr": ""},  
+  {"Dato": ""},
+  {"Internt_Godkjent": true},
+  {"Eksternt_Godkjent": true},
+  {"Aktivt": true},
+  {"Bruker_ID_A": 2},
+  {"Blandekortdata": [
+        
+            {"Preparat1": 
+                {"Handelsnavn": "Ketalar",
+                 "Tillegg": ""}
+            },
+            {"Preparat2": 
+                {"Handelsnavn":"Ketamin",
+                "Tillegg": "Abcur"}
+            } 
+        ,
+        {"Styrke":[
+            {"1": [
+                {"Volum": 10},
+                {"Maaleenhet": "mg/ml"},
+                {"Form": "inj. væske"},
+                {"Beholder":["Ampulle","Hetteglass"]},
+                {"Stamløsning":[]},
+                {"Konsentrasjon": ""}
+                
+            ]},
+            {"2": [
+                {"Volum": 50},
+                {"Maaleenhet": "mg/ml"},
+                {"Form": "inj. væske"},
+                {"Beholder":["Ampulle","Hetteglass"]},
+                {"Stamløsning":[]},
+                {"Konsentrasjon": ""}
+            ]},
+            {"Blandekortfrase": [
+                {"Frase1": ""},
+                {"Frase2": ""}
+            ]}
+        ]},
+        {"Videre fortynning":[
+            {"Ufortynnet": true},
+            {"Fortynnes": [
+                {"Fortynnes": true},
+                {"Fortynningsvæske": "NaCl 9 mg/ml"},
+                {"Konsentrasjon": [
+                    {"Frase": "Anbefalt makskonsentrasjon v/ perifer administrasjon"},
+                    {"Volum": "10 mg/ml"}
+                ]},
+                {"Tileggsfraser": [
+                    {"Frase1": ""}
+                ]}
+              ]},
+              {"Blandekortfrase": [
+                {"Frase1": ""},
+                {"Frase2": ""},
+                {"Frase3": ""}
+              ]}
+            ]},
+        {"Administrasjon": [
+            {"Adm1":[
+                {"Metode": "IV injeksjon"},
+                {"Metodetilegg": "Over minst 1 minutt"}
+            ]},
+            {"Adm2":[
+                {"Metode": "Kontinuerlig IV infusjon"},
+                {"Metodetilegg":"Etter legns ordinasjon"}
+            ]},
+            {"Tillegsfrase": "Kan gis IM"},
+            {"Blandekortfrase": [
+                {"Frase1": ""},
+                {"Frase2": ""},
+                {"Frase3": ""}
+            ]}
+         ]},
+        {"Holdbarhet": [
+            {"Form1": [
+                {"Form": "Ampuller"},
+                {"Oppbevaring": "Engangsbruk"}
+            ]},
+            {"Form2": [
+                {"Form": "Anbrutt hetteglass"},
+                {"Oppbevering": "7 dager i RT"}
+            ]},
+            {"Form3": [
+                {"Form": "Kontinuerlig infusjon"},
+                {"Oppbevaring": "24 timer RT"}
+            ]},
+            {"Blandekortfrase": [
+                {"Frase1": ""},
+                {"Frase2": ""},
+                {"Frase3": ""}
+            ]}
+         ]}, 
+        {"Merknader": [
+            {"Tromboflebitt": true},
+            {"Antidot": [
+                {"true/false": false},
+                {"Tekst": "Fritekst"}
+            ]},
+            {"Bivirkninger":["Kan gi","depresjon","hallusinasjoner"]},
+            {"Monitorering": ["respirasjon", "blodtrykk","må monitoreres"]},
+            {"Blandekortfrase": [
+                {"Frase1": ""},
+                {"Frase2": ""},
+                {"Frase3": ""}
+            ]}
+         ]},    
+        {"Tilleggsopplsyninger": [
+            {"Stjernanmerkning": [""]},
+            {"Fritekst":""},
+            {"Y-settforlikelige væsker": "En frase"},
+            {"Blandekortfrase": [
+                {"Frase1": ""},
+                {"Frase2": ""},
+                {"Frase3": ""}
+            ]}
+        ]},
+        {"Bunntekst":[
+            {"Standard": "Blandekort til barn"},
+            {"Kilder": "Se egen referanseliste"},
+            {"Sist endret": "Dato"},
+            {"Versjon": "3.0"}
+        ]}
+    ]},
+  {"Fortynningforslag": [
+    {"Barn": [
+        {"Fortynning1":[
+            {"Metode": "Injeksjon"},
+            {"Kommentar": "Ordinert does etter vekt barn"}
+        ]},
+        {"Fortynning2": [
+            {"Metode": "Kontinuerlig infusjon"},
+            {"Forslag": [
+                {"Ketamin 10 mg/ml": [
+                    {"Fortynning til":[
+                        {"5 mg/ml": [
+                            {"Forslag1":[
+                                {"Totalvolum": "20 ml"},
+                                {"hente styrke fra styrke": "10 ml"},
+                                {"Fortynningvæske": "10 ml"}
+                            ]},
+                            {"Forslag2":[
+                                {"Totalvolum": "50 ml"},
+                                {"hente styrke fra styrke": "25 ml"},
+                                {"Fortynningvæske": "25 ml"}
+                            ]}
+                        ]}
+                    ]}
+                ]},
+                {"Ketamin 50 mg/ml": [
+                    {"Fortynning til": [
+                        {"10 mg/ml": [
+                            {"Forslag1":[
+                                {"Totalvolum": "20 ml"},
+                                {"hente styrke fra styrke": "4 ml"},
+                                {"Fortynningvæske": "16 ml"}
+                            ]},
+                            {"Forslag2":[
+                                {"Totalvolum": "50 ml"},
+                                {"hente styrke fra styrke": "10 ml"},
+                                {"Fortynningvæske": "40 ml"}
+                            ]}
+                        ]}
+                    ]}
+                ]}
+            ]}
+        ]}
+    ]},
+    {"Nyfødt": [
+        {"Fortynning1": [
+            {"Metode": ""},
+            {"Forslag": [
+                {"Ketamin 10 mg/ml": [
+                    {"Fortynning til":[
+                        {"5 mg/ml": [
+                            {"Forslag1":[
+                                {"Totalvolum": "10 ml"},
+                                {"hente styrke fra styrke": "5 ml"},
+                                {"Fortynningvæske": "5 ml"}
+                            ]}
+                        ]}
+                    ]}
+                ]},
+                {"Ketamin 50 mg/ml": [
+                    {"Fortynning til": [
+                        {"5 mg/ml":[
+                            {"Forslag1":[
+                                {"Totalvolum": "10 ml"},
+                                {"hente styrke fra styrke": "1 ml"},
+                                {"Fortynningvæske": "9 ml"}
+                            ]}
+                        ]},
+                        {"10 mg/ml": [
+                            {"Forslag1":[
+                                {"Totalvolum": "10 ml"},
+                                {"hente styrke fra styrke": "2 ml"},
+                                {"Fortynningvæske": "8 ml"}
+                            ]}
+                        ]}
+                    ]}
+                ]}
+            ]}
+        ]}
+    ]}
+  ]}
+]
