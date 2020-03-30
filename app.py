@@ -130,7 +130,7 @@ def blandekort():
     return jsonify(o), 200
 
 @app.route('/api/aktiveBlandekort', methods=['GET'])
-#@jwt_required
+@jwt_required
 def getActive():
 
     conn = mysql.connect()
