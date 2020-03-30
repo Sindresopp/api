@@ -139,7 +139,7 @@ def getActive():
                 inner join Virkestoff as v on v.ATC_kode = b.ATC_kode 
                 inner join Preparat as p on p.ATC_kode=b.ATC_kode 
                 where b.Aktivt = %(true)s
-                group by p.ATC_kode, b.Dato, b.VersjonsNr""", {"string":"%d.%m.%Y","true": True})
+                group by v.Virkestfoffnavn,p.ATC_kode, b.Dato, b.VersjonsNr""", {"string":"%d.%m.%Y","true": True})
     res = cur.fetchall()
     o = []
     for x in res:
@@ -151,7 +151,6 @@ def getActive():
             "VersjonsNr":x[3],
             "Handelsnavn": a
         })
-    print(x[4].split(','))
     return jsonify(o), 200
 
 @app.route('/json', methods=["POST"])
