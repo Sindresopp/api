@@ -111,7 +111,7 @@ def blandekort():
 
     conn = mysql.connect()
     cur = conn.cursor()
-    cur.execute('select * from Blandekort where ATC_VNR="N01A X03-3.2"')
+    cur.execute('select * from Blandekort where ATC_VNR="N01A X03-3.0"')
     all_blandekort = cur.fetchall()
     o = []
     for x in all_blandekort:
@@ -130,11 +130,27 @@ def blandekort():
     return jsonify(o), 200
 
 @app.route('/api/aktiveBlandekort', methods=['GET'])
+@jwt_required
 def getActive():
 
     conn = mysql.connect()
     cur = conn.cursor()
-    cur.execute("Select Virkestoff, ATC_kode, versjonsNr, blandekortdata->>($.[d]) from Blandekort inner join Preparat on p.ATC_kode = b.ATC_kode where aktiv = %(aktiv)s", {"aktiv": 1})
+    cur.execute(""" select b.ATC_kode, v.Virkestfoffnavn, date_format(b.dato, "%d.%m.%Y"), b.VersjonsNr,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
+                inner join Virkestoff as v on v.ATC_kode = b.ATC_kode 
+                inner join Preparat as p on p.ATC_kode=b.ATC_kode group by p.ATC_kode, b.Dato, b.VersjonsNr""")
+    res = cur.fetchall()
+    o = []
+    for x in res:
+        a = x[4].split(',')
+        o.append({
+            "ATC_kode":x[0],
+            "Virkestoff":x[1],
+            "Dato":x[2],
+            "VersjonsNr":x[3],
+            "Handelsnavn": a
+        })
+    print(x[4].split(','))
+    return jsonify(o), 200
 
 @app.route('/json', methods=["POST"])
 def json_example():
