@@ -130,14 +130,16 @@ def blandekort():
     return jsonify(o), 200
 
 @app.route('/api/aktiveBlandekort', methods=['GET'])
-@jwt_required
+#@jwt_required
 def getActive():
 
     conn = mysql.connect()
     cur = conn.cursor()
-    cur.execute(""" select b.ATC_kode, v.Virkestfoffnavn, date_format(b.dato, "%d.%m.%Y"), b.VersjonsNr,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
+    cur.execute(""" select b.ATC_kode, v.Virkestfoffnavn, date_format(b.dato, %(string)s), b.VersjonsNr,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
                 inner join Virkestoff as v on v.ATC_kode = b.ATC_kode 
-                inner join Preparat as p on p.ATC_kode=b.ATC_kode group by p.ATC_kode, b.Dato, b.VersjonsNr""")
+                inner join Preparat as p on p.ATC_kode=b.ATC_kode 
+                where b.Aktivt = %(true)s
+                group by p.ATC_kode, b.Dato, b.VersjonsNr""", {"string":"%d.%m.%Y","true": True})
     res = cur.fetchall()
     o = []
     for x in res:
