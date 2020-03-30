@@ -129,6 +129,13 @@ def blandekort():
    
     return jsonify(o), 200
 
+@app.route('/api/aktiveBlandekort', methods=['GET'])
+def getActive():
+
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute("Select Virkestoff, ATC_kode, versjonsNr, blandekortdata->>($.[d]) from Blandekort inner join Preparat on p.ATC_kode = b.ATC_kode where aktiv = %(aktiv)s", {"aktiv": 1})
+
 @app.route('/json', methods=["POST"])
 def json_example():
     if request.is_json:   
