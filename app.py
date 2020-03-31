@@ -103,31 +103,34 @@ def customers():
                   "city":customer[5]})
     return jsonify(x)
 
-# Get all blandekort from db
+# Get a specific card 
 
 @app.route('/api/blandekort', methods=["GET"])
 @jwt_required
 def blandekort():
-
+    atc_vnr = request.args['atc_vnr']
+    
     conn = mysql.connect()
     cur = conn.cursor()
-    cur.execute('select * from Blandekort where ATC_VNR="N01A X03-3.0"')
+    query = """select b.ATC_VNR, b.ATC_kode,v.Virkestfoffnavn, b.VersjonsNr, date_format(b.dato, %(date_format)s) as Dato, b.Blandekortdata, b.Fortynning  From Blandekort as b 
+               inner join Virkestoff as v on b.ATC_kode=v.ATC_kode 
+               where ATC_VNR = %(card)s;"""
+    values = {"date_format":"%d.%m.%Y" ,"card": atc_vnr}
+    cur.execute(query, values)
     all_blandekort = cur.fetchall()
+    
     o = []
     for x in all_blandekort:
         o.append({"ATC_VNR":x[0], 
                   "ATC_kode":x[1],
-                  "Bruker_ID":x[2],
+                  "Virkestoff":x[2],
                   "VersjonsNr":x[3],
                   "Dato":x[4],
-                  "Internt_Godjent":x[5],
-                  "Eksternt_Godjent":x[6],
-                  "Aktivt":x[7],
-                  "Bruker_ID_A":x[8],
-                  "Blandekortdata":x[9],
-                  "Fortynning": x[10]})
-   
+                  "Blandekortdata":x[5],
+                  "Fortynning":x[6]})
     return jsonify(o), 200
+
+#Get acitve cards
 
 @app.route('/api/aktiveBlandekort', methods=['GET'])
 @jwt_required
@@ -135,11 +138,13 @@ def getActive():
 
     conn = mysql.connect()
     cur = conn.cursor()
-    cur.execute(""" select b.ATC_kode, v.Virkestfoffnavn, date_format(b.dato, %(string)s), b.VersjonsNr,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
+    query = """ select b.ATC_kode, v.Virkestfoffnavn, date_format(b.dato, %(string)s), b.VersjonsNr,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
                 inner join Virkestoff as v on v.ATC_kode = b.ATC_kode 
                 inner join Preparat as p on p.ATC_kode=b.ATC_kode 
                 where b.Aktivt = %(true)s
-                group by v.Virkestfoffnavn,p.ATC_kode, b.Dato, b.VersjonsNr""", {"string":"%d.%m.%Y","true": True})
+                group by v.Virkestfoffnavn,p.ATC_kode, b.Dato, b.VersjonsNr"""
+    values = {"string":"%d.%m.%Y","true": True}
+    cur.execute(query, values)
     res = cur.fetchall()
     o = []
     for x in res:

@@ -14,4 +14,4 @@ MYSQL_DATABASE_DB = 'v2test'
 MYSQL_DATABASE_HOST = 'databasenettverket.westeurope.cloudapp.azure.com'
 
 JWT_SECRET_KEY = "t1NP63m4wnBg6nyHYKfmc2TpCOGI4nss"
-JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
+JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=12)
