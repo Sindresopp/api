@@ -112,7 +112,8 @@ def blandekort():
     
     conn = mysql.connect()
     cur = conn.cursor()
-    query = """select b.ATC_VNR, b.ATC_kode,v.Virkestfoffnavn, b.VersjonsNr, date_format(b.dato, %(date_format)s) as Dato, b.Blandekortdata, b.Fortynning  From Blandekort as b 
+    query = """select b.ATC_VNR, b.ATC_kode,v.Virkestfoffnavn, b.VersjonsNr, date_format(b.dato, %(date_format)s), b.Blandekortdata, 
+               b.Fortynning, b.Bruker_ID,b.Bruker_ID_A, b.Internt_Godkjent,b.Eksternt_Godkjent,b.aktivt  From Blandekort as b 
                inner join Virkestoff as v on b.ATC_kode=v.ATC_kode 
                where ATC_VNR = %(card)s;"""
     values = {"date_format":"%d.%m.%Y" ,"card": atc_vnr}
@@ -127,7 +128,12 @@ def blandekort():
                   "VersjonsNr":x[3],
                   "Dato":x[4],
                   "Blandekortdata":x[5],
-                  "Fortynning":x[6]})
+                  "Fortynning":x[6],
+                  "Bruker_ID": x[7],
+                  "Bruker_Aktivert":x[8],
+                  "Internt_Godkjent":x[9],
+                  "Eksternt_Godkjent":x[10],
+                  "Aktivt":x[11]})
     return jsonify(o), 200
 
 #Get acitve cards
