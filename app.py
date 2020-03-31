@@ -144,22 +144,23 @@ def getActive():
 
     conn = mysql.connect()
     cur = conn.cursor()
-    query = """ select b.ATC_kode, v.Virkestfoffnavn, date_format(b.dato, %(string)s), b.VersjonsNr,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
+    query = """ select b.ATC_kode, v.Virkestfoffnavn, date_format(b.dato, %(string)s), b.VersjonsNr, b.ATC_VNR,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
                 inner join Virkestoff as v on v.ATC_kode = b.ATC_kode 
                 inner join Preparat as p on p.ATC_kode=b.ATC_kode 
                 where b.Aktivt = %(true)s
-                group by v.Virkestfoffnavn,p.ATC_kode, b.Dato, b.VersjonsNr"""
+                group by v.Virkestfoffnavn,p.ATC_kode,b.ATC_VNR, b.Dato, b.VersjonsNr"""
     values = {"string":"%d.%m.%Y","true": True}
     cur.execute(query, values)
     res = cur.fetchall()
     o = []
     for x in res:
-        a = x[4].split(',')
+        a = x[5].split(',')
         o.append({
             "ATC_kode":x[0],
             "Virkestoff":x[1],
             "Dato":x[2],
             "VersjonsNr":x[3],
+            "ATC_VNR": x[4],
             "Handelsnavn": a
         })
     return jsonify(o), 200
