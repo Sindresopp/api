@@ -29,21 +29,6 @@ def add_claim_to_access_token(user):
 def user_identity_lookup(user):
     return user.username
 
-@app.route('/api/test', methods=["GET"])
-@cross_origin()
-@jwt_required
-def index():
-    ret = get_raw_jwt()
-    print (ret['exp'])
-   # user = get_jwt_identity()
-
-    return jsonify(ret),200
-
-@app.route('/api/getResponse', methods=["POST"])
-@cross_origin()
-def repsonse():
-    req = request.data
-    return req
 
 # Create token for user on logon
 @app.route('/api/createToken', methods=["POST"])
@@ -82,26 +67,59 @@ def createToken():
 
         return make_response(jsonify({"message": "Request body must be JSON"}), 400)
 
-
-@app.route('/api/customers', methods=["GET"])
-@admin_required
-def customers():
+@app.route('/api/virkestoff', methods=["GET"])
+@jwt_required
+def virkestoff():
     conn = mysql.connect()
-
     cur = conn.cursor()
-    cur.execute("Select * from Customers")
-    all_customers = cur.fetchall()
+    
+    query = "SELECT * FROM Virkestoff ORDER BY Virkestfoffnavn"
 
-    x = []
+    cur.execute(query)
 
-    for customer in all_customers:
-        x.append({"id":customer[0], 
-                  "firstName":customer[1],
-                  "lastName":customer[2],
-                  "email":customer[3],
-                  "phone":customer[4],
-                  "city":customer[5]})
-    return jsonify(x)
+    res = cur.fetchall()
+    cur.close()
+    o = []
+    for x in res:
+        o.append({
+            "ATC_kode":x[0],
+            "Virkestoff":x[1]
+        })
+    return jsonify(o), 200
+
+@app.route('/api/preparat')
+@jwt_required
+def preparatByATC():
+    atc_kode = request.args['atc_kode']
+
+    if (len(atc_kode) == 8):
+
+        conn = mysql.connect()
+        cur = conn.cursor()
+
+        query = "SELECT * FROM Preparat WHERE ATC_kode = %(atc_kode)s"
+
+        values = {"atc_kode": atc_kode}
+        
+        cur.execute(query, values)
+
+        res = cur.fetchall()
+
+        if not res:
+            return "Det finnes ingen preparat på denne atc koden.",204
+        
+        o = []
+
+        for x in res:
+            o.append({
+                "id": x[0],
+                "Handelsnavn": x[1],
+                "Produsent": x[2]
+            })
+
+        return jsonify(o), 200
+    
+    return jsonify("ATC koden er feil"), 400
 
 # Get a specific card 
 
@@ -119,6 +137,9 @@ def blandekort():
     values = {"date_format":"%d.%m.%Y" ,"card": atc_vnr}
     cur.execute(query, values)
     all_blandekort = cur.fetchall()
+
+    if not all_blandekort:
+        return "Det finnes ingen blandekort med denne id'en", 204
     
     o = []
     for x in all_blandekort:
