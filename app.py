@@ -157,8 +157,54 @@ def blandekort():
                   "Aktivt":x[11]})
     return jsonify(o), 200
 
-#Get acitve cards
+@app.route('/api/tabell', methods=['GET'])
+@admin_required
+def getTable():
+    req =request.args['tabell']
+    stottetabeller = [ 
+                      "Admin_tid", 
+                      "Admin_tid_tillegg", 
+                      "Administrasjonmetode", 
+                      "Beholder",
+                      "Bivrirkninger",
+                      "Forslag_f_form",
+                      "Fraser_Stamloesning",
+                      "Fraser_admin",
+                      "Fraser_forslag_f",
+                      "Fraser_vfortynning",
+                      "Loesning_fortynning",
+                      "Maaleenhet",
+                      "Monitorering",
+                      "Tillegg_informasjon",
+                      "Vaeske_fortynning",
+                      "Valg_fortynning",
+                      "Valg_holdbarhet",
+                      "Y_vaesker" 
+                    ]
+    if req in stottetabeller:
 
+        print(req)
+        conn = mysql.connect()
+        cur = conn.cursor()
+        query = 'SELECT * FROM '
+        values = req
+        query += values
+        cur.execute(query)
+
+        res = cur.fetchall()
+
+        o = []
+
+        for x in res:
+            o.append({
+                "id": x[0],
+                "innhold": x[1]
+            })
+
+        return jsonify(o),200
+    return jsonify("Tabellnavn ikke godkjent"), 204
+
+#Get acitve cards
 @app.route('/api/aktiveBlandekort', methods=['GET'])
 @jwt_required
 def getActive():

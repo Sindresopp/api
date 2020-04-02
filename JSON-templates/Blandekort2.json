@@ -27,11 +27,10 @@
                 "Malleenhet":"mg/ml",
                 "Form": "inj.væske",
                 "Beholder": ["Ampulle","Hettglass"],
-                "Stamløsning": {"Stamvolum":10,
-                                "Stammaaleenhet": "Mg/ml",
-                                "Stamfrase":"hei stamløsning"
-                                },
-                "Konsentrasjon": "10 mg/ml"
+                "Stamlosning":10,
+                "Konsentrasjon": "10 mg/ml",
+                "Frase": "Frase1",
+                "Stamfrase": "hei stamløsning"
                 }
             },
             {"Styrke2":
@@ -40,17 +39,12 @@
                 "Malleenhet":"mg/ml",
                 "Form": "inj.væske",
                 "Beholder": ["Ampulle","Hettglass"],
-                "Stamløsning": {"Stamvolum":10,
-                                "Stammaaleenhet": "Mg/ml",
-                                "Stamfrase":"hei stamløsning"
+                "Stamlosning": {"Stamvolum":10,
+                                "Stammaaleenhet": "Mg/ml"
                                 },
-                "Konsentrasjon": "50 mg/ml"
-                }
-            },
-            {"Styrkefraser":
-                {
-                "Frase1": "Frase1",
-                "Frase2": "Frase2"
+                "Konsentrasjon": "50 mg/ml",
+                "Frase": "Frase1",
+                "Stamfrase": "hei stamløsning"
                 }
             },
             {"Videre fortynning":
@@ -76,13 +70,13 @@
             {"Administrasjon": {
                 "Admin1": {
                     "Metode": "IV injeksjon",
-                    "Metodetillegg": "Over minst 1 minutt"
+                    "Metodetillegg": "Over 3-5 minutter"
                     },
                 "Admin2": {
-                    "Metode": "Kontinuerlig IV infusjon",
-                    "Metodetillegg": "Etter legens ordinasjon"
+                    "Metode": "IV infusjon",
+                    "Metodetillegg": "Over 30-60 minutter"
                     },
-                "Tilleggsfrase": "Kan gis IM"
+                "Tilleggsfrase": ""
                 }
             },
             {"Admin_fraser":{
@@ -93,16 +87,12 @@
             },
             {"Holdbarhet":{
                 "Form1": {
-                    "Form": "Ampulle",
-                    "Oppbevaring": "Engangsbruk"
+                    "Form": "Stamløsing",
+                    "Oppbevaring": ["6 timer i RT","24 timer i KJ"]
                     },
                 "Form2": {
-                    "Form": "Anbrutt hetteglass",
-                    "Oppbevaring": "7 dager i RT"
-                    },
-                "Form3": {
-                    "Form": "Kontinuerlig infusjon",
-                    "Oppbevaring": "24 timer i RT"
+                    "Form": "Fortynnet løsning",
+                    "Oppbevaring": ["12 timer i RT","24 timer i KJ"]
                     }
                 }
 
