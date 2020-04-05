@@ -157,52 +157,27 @@ def blandekort():
                   "Aktivt":x[11]})
     return jsonify(o), 200
 
-@app.route('/api/tabell', methods=['GET'])
+@app.route('/api/tabell', methods=['POST'])
 @admin_required
-def getTable():
-    req =request.args['tabell']
-    stottetabeller = [ 
-                      "Admin_tid", 
-                      "Admin_tid_tillegg", 
-                      "Administrasjonmetode", 
-                      "Beholder",
-                      "Bivrirkninger",
-                      "Forslag_f_form",
-                      "Fraser_Stamloesning",
-                      "Fraser_admin",
-                      "Fraser_forslag_f",
-                      "Fraser_vfortynning",
-                      "Loesning_fortynning",
-                      "Maaleenhet",
-                      "Monitorering",
-                      "Tillegg_informasjon",
-                      "Vaeske_fortynning",
-                      "Valg_fortynning",
-                      "Valg_holdbarhet",
-                      "Y_vaesker" 
-                    ]
-    if req in stottetabeller:
+def addToTable():
+    print(request.get_data())
+    if request.is_json:
+        req = request.get_json()
+        table = req.get('tabell')
+        input = req.get('input')
 
-        print(req)
         conn = mysql.connect()
         cur = conn.cursor()
-        query = 'SELECT * FROM '
-        values = req
-        query += values
-        cur.execute(query)
 
-        res = cur.fetchall()
-
-        o = []
-
-        for x in res:
-            o.append({
-                "id": x[0],
-                "innhold": x[1]
-            })
-
-        return jsonify(o),200
-    return jsonify("Tabellnavn ikke godkjent"), 204
+        query = "INSERT INTO "
+        query += table
+        query += " VALUES (%(id)s,%(value)s)"
+        values = {"id": None, "value": input}
+        cur.execute(query, values)
+        conn.commit()
+        cur.close()       
+        return jsonify("Suksess") ,200
+        
 
 #Get acitve cards
 @app.route('/api/aktiveBlandekort', methods=['GET'])
