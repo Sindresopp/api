@@ -11,7 +11,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 import datetime
 from models.classes import UserObject
 from wrappers import admin_required
-from functions import isAdmin
+from functions import isAdmin, addStotte, addVirkestoff, addPreparat, addLenke, addReferanse, addLMU
 
 
 app = Flask(__name__)
@@ -73,7 +73,7 @@ def virkestoff():
     conn = mysql.connect()
     cur = conn.cursor()
     
-    query = "SELECT * FROM Virkestoff ORDER BY Virkestfoffnavn"
+    query = "SELECT * FROM Virkestoff ORDER BY VirkeStoffNavn"
 
     cur.execute(query)
 
@@ -130,7 +130,7 @@ def blandekort():
     
     conn = mysql.connect()
     cur = conn.cursor()
-    query = """select b.ATC_VNR, b.ATC_kode,v.Virkestfoffnavn, b.VersjonsNr, date_format(b.dato, %(date_format)s), b.Blandekortdata, 
+    query = """select b.ATC_VNR, b.ATC_kode,v.VirkeStoffNavn, b.VersjonsNr, date_format(b.dato, %(date_format)s), b.Blandekortdata, 
                b.Fortynning, b.Bruker_ID,b.Bruker_ID_A, b.Internt_Godkjent,b.Eksternt_Godkjent,b.aktivt  From Blandekort as b 
                inner join Virkestoff as v on b.ATC_kode=v.ATC_kode 
                where ATC_VNR = %(card)s;"""
@@ -157,27 +157,14 @@ def blandekort():
                   "Aktivt":x[11]})
     return jsonify(o), 200
 
-@app.route('/api/tabell', methods=['POST'])
+@app.route('/api/tabell/<sporring>', methods=['POST'])
 @admin_required
-def addToTable():
+def addToTable(sporring):
     print(request.get_data())
     if request.is_json:
         req = request.get_json()
-        table = req.get('tabell')
-        input = req.get('input')
 
-        conn = mysql.connect()
-        cur = conn.cursor()
-
-        query = "INSERT INTO "
-        query += table
-        query += " VALUES (%(id)s,%(value)s)"
-        values = {"id": None, "value": input}
-        cur.execute(query, values)
-        conn.commit()
-        cur.close()       
-        return jsonify("Suksess") ,200
-        
+        return globals()[sporring](req, mysql)
 
 #Get acitve cards
 @app.route('/api/aktiveBlandekort', methods=['GET'])
@@ -186,11 +173,11 @@ def getActive():
 
     conn = mysql.connect()
     cur = conn.cursor()
-    query = """ select b.ATC_kode, v.Virkestfoffnavn, date_format(b.dato, %(string)s), b.VersjonsNr, b.ATC_VNR,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
+    query = """ select b.ATC_kode, v.VirkeStoffNavn, date_format(b.dato, %(string)s), b.VersjonsNr, b.ATC_VNR,  group_concat(p.Handelsnavn) as Handelsnavn from Blandekort as b 
                 inner join Virkestoff as v on v.ATC_kode = b.ATC_kode 
                 inner join Preparat as p on p.ATC_kode=b.ATC_kode 
                 where b.Aktivt = %(true)s
-                group by v.Virkestfoffnavn,p.ATC_kode,b.ATC_VNR, b.Dato, b.VersjonsNr"""
+                group by v.VirkeStoffNavn,p.ATC_kode,b.ATC_VNR, b.Dato, b.VersjonsNr"""
     values = {"string":"%d.%m.%Y","true": True}
     cur.execute(query, values)
     res = cur.fetchall()
@@ -207,23 +194,27 @@ def getActive():
         })
     return jsonify(o), 200
 
-@app.route('/json', methods=["POST"])
-def json_example():
-    if request.is_json:   
-        req = request.get_json()
-       
-        response_body = {
-            "message": "JSON recieved!!",
-            "sender": req.get("name")
-        }
 
-        res = make_response(jsonify(response_body), 200)
+@app.route('/add/innhold/<table>', methods=['POST'])
+def leggTil(table):
+    tabell = table
+    req = request.get_json()
 
-        return res
+    conn = mysql.connect()
+    cur = conn.cursor()
 
-    else:
+    query = "Insert into "
+    query += tabell
+    query += " values (%(id)s,%(innhold)s)"
+    value = ""
 
-        return make_response(jsonify({"message": "Request body must be JSON"}), 400)
+    for a in req:
+        value = {"id":None,"innhold": a}
+        cur.execute(query, value)
+        conn.commit()
+
+    return "done"
+
 
 
 if __name__ == '__main__':
