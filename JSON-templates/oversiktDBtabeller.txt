@@ -5,4 +5,4 @@ Administrasjon: Admin_tid, Admin_tid_tillegg, Admin_tilleggfrase
 Holdbarhet: Valg_holdbarhet
 Merknader: Bivirkninger (Tom), Monitorering (Tom)
 Tilleggsopplysinger: Y_vaesker, Tillegg_informasjon (Tom)
-Fortynnnigsforslag: Fraser_f_form, Fraser_forslag_f
+Fortynnnigsforslag: Fraser_f_form (Tom), Fraser_forslag_f (Tom)

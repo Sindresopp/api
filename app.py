@@ -87,7 +87,7 @@ def virkestoff():
         })
     return jsonify(o), 200
 
-@app.route('/api/preparat')
+@app.route('/api/preparat', methods=['GET'])
 @jwt_required
 def preparatByATC():
     atc_kode = request.args['atc_kode']
@@ -114,7 +114,8 @@ def preparatByATC():
             o.append({
                 "id": x[0],
                 "Handelsnavn": x[1],
-                "Produsent": x[2]
+                "Produsent": x[2],
+                "ATC_kode": x[3]
             })
 
         return jsonify(o), 200
@@ -157,6 +158,42 @@ def blandekort():
                   "Aktivt":x[11]})
     return jsonify(o), 200
 
+#Get tables
+@app.route('/api/tabell', methods=['GET'])
+@admin_required
+def getStotteTables():
+
+    conn = mysql.connect()
+    cur = conn.cursor()
+    tables = ["Beholder", 
+              "Maaleenhet", 
+              "Form",
+              "Fraser_Stamloesning", 
+              "Valg_vfortynning", 
+              "Loesning_vfortynning", 
+              "L_VF_tillegg", 
+              "Fraser_vfortynning", 
+              "Vaeske_vfortynning", 
+              "Admin_tid", 
+              "Admin_tid_tillegg", 
+              "Admin_tilleggfrase",
+              "Valg_holdbarhet",
+              "Y_vaesker"
+              ]
+
+    o = []
+
+    for x in tables:
+      query = "SELECT * FROM " + x
+      cur.execute(query)
+      res = cur.fetchall()
+      o.append({x:res})
+
+
+    return jsonify(o), 200
+
+
+#Add to table
 @app.route('/api/tabell/<sporring>', methods=['POST'])
 @admin_required
 def addToTable(sporring):
