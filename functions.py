@@ -189,3 +189,14 @@ def addLMU(req, mysql):
     cur.close() 
     
     return jsonify("Fikk ikke lagt til innholdet"), 204
+
+def getUserIDByName(user, cur):
+
+    query = "SELECT Bruker_ID FROM Bruker where Brukernavn = %(user)s"
+    values = {"user": user}
+
+    cur.execute(query, values)
+
+    res = cur.fetchone()
+
+    return res[0]
