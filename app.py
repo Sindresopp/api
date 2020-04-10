@@ -390,7 +390,7 @@ def updateGodkjenn():
 
 #Get tables
 @app.route('/api/tabell', methods=['GET'])
-@admin_required
+@jwt_required
 def getStotteTables():
 
     conn = mysql.connect()
@@ -408,7 +408,9 @@ def getStotteTables():
               "Admin_tid_tillegg", 
               "Admin_tilleggfrase",
               "Valg_holdbarhet",
-              "Y_vaesker"
+              "Y_vaesker",
+              "Bivirkninger",
+              "Monitorering"
               ]
 
     o = []
