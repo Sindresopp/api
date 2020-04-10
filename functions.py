@@ -8,6 +8,8 @@ def isAdmin(res):
 
 def addStotte(req, mysql):
     table = req.get('tabell')
+    kollonne = table.get('kolonne')
+    tabell = table.get('tabell')
     input = req.get('input')
 
     conn = mysql.connect()
@@ -16,16 +18,18 @@ def addStotte(req, mysql):
     #Check if value exists
 
     checkQuery ="SELECT * FROM "
-    checkQuery += table
-    checkQuery +=" WHERE Beh_navn = %(beholder)s"
-    checkValue = {"beholder": input}
+    checkQuery += tabell
+    checkQuery +=" WHERE "
+    checkQuery += kollonne
+    checkQuery += " = %(input)s"
+    checkValue = {"input": input}
     cur.execute(checkQuery, checkValue)
 
     if cur.rowcount != 0:
         return jsonify("Innhold finnes alt i tabellen"), 403
 
     query = "INSERT INTO "
-    query += table
+    query += tabell
     query += " VALUES (%(id)s,%(value)s)"
     values = {"id": None, "value": input}
     cur.execute(query, values)

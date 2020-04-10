@@ -516,25 +516,25 @@ def sendCardHoering():
 
 
 # #Add item to table
-# @app.route('/add/innhold/<table>', methods=['POST'])
-# def leggTil(table):
-    # tabell = table
-    # req = request.get_json()
+@app.route('/add/innhold/<table>', methods=['POST'])
+def leggTil(table):
+    tabell = table
+    req = request.get_json()
 
-    # conn = mysql.connect()
-    # cur = conn.cursor()
+    conn = mysql.connect()
+    cur = conn.cursor()
 
-    # query = "Insert into "
-    # query += tabell
-    # query += " values (%(id)s,%(innhold)s)"
-    # value = ""
+    query = "Insert into "
+    query += tabell
+    query += " values (%(id)s,%(innhold)s)"
+    value = ""
 
-    # for a in req:
-    #     value = {"id":None,"innhold": a}
-    #     cur.execute(query, value)
-    #     conn.commit()
+    for a in req:
+        value = {"id":None,"innhold": a}
+        cur.execute(query, value)
+        conn.commit()
 
-    # return "done"
+    return "done"
 
 
 
