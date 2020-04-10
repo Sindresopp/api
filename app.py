@@ -37,6 +37,12 @@ def checkID():
     return jsonify(identity, role)
 
 
+#Conect to DB and returns cursor
+def connectDB():
+    conn = mysql.connect()
+    cur = conn.cursor()
+    return cur, conn
+
 # Create token for user on logon
 @app.route('/api/createToken', methods=["POST"])
 def createToken():
@@ -130,6 +136,10 @@ def preparatByATC():
         return jsonify(o), 200
     
     return jsonify("ATC koden er feil"), 400
+
+#
+# Spørringer for blandekort
+#
 
 # Get a specific card 
 
@@ -338,6 +348,10 @@ def updateGodkjenn():
             return jsonify('Brukeren har alt godkjent dette kortet'), 403
         
         userID = getUserIDByName(user, cur)
+
+        if not userID:
+            return jsonify('Fant ingen bruker'), 403
+
         dateNow = datetime.datetime.now()
 
         
@@ -352,8 +366,27 @@ def updateGodkjenn():
 
             cur.execute(query, queryValues)
             conn.commit()
-        return jsonify("Godkjent tabell oppdatert"), 200
-    return jsonify("Hei det funker ikke")
+            return jsonify("Godkjent tabell oppdatert"), 200
+
+        if req.get('ForsteGod'):
+            query += " Bruker_ID3 = %(user)s, Dato_3 = Date(%(date)s) where ATC_VNR = %(atcvnr)s "
+            queryValues = {"user": userID, "date":dateNow.strftime('%Y-%m-%dT%H:%M:%S'), "atcvnr": ATC_VNR }
+            
+            cur.execute( query, queryValues)
+            conn.commit()
+
+            updateCardQuery = " UPDATE Blandekort SET Internt_Godkjent = %(bool)s WHERE ATC_VNR = %(atcvnr)s "
+            updateCardValues = {"bool": True, "atcvnr": ATC_VNR}
+            cur.execute(updateCardQuery,updateCardValues)
+            conn.commit()
+            return jsonify("Blandekort ferdig godkjent"),200
+
+    return jsonify("Forespørselen er feil"), 400
+
+
+#
+# Spørringer for tabeller 
+#
 
 #Get tables
 @app.route('/api/tabell', methods=['GET'])
@@ -401,26 +434,107 @@ def addToTable(sporring):
         return globals()[sporring](req, mysql)
 
 
-#Add item to table
-@app.route('/add/innhold/<table>', methods=['POST'])
-def leggTil(table):
-    tabell = table
-    req = request.get_json()
+#
+# Spørringer for høring
+#
+
+@app.route('/api/hoering/kort', methods=['GET'])
+@jwt_required
+def getCardHoering():
 
     conn = mysql.connect()
     cur = conn.cursor()
 
-    query = "Insert into "
-    query += tabell
-    query += " values (%(id)s,%(innhold)s)"
-    value = ""
+    query = """ select b.ATC_kode, date_format(b.Dato,%(date_string)s), b.VersjonsNr, b.ATC_VNR, v.VirkeStoffNavn
+                from Blandekort as b 
+                inner join Virkestoff as v on v.ATC_kode = b.ATC_kode 
+                left join Hoering as h on h.ATC_kode = b.ATC_kode 
+                where b.Eksternt_godkjent = %(eksternt)s and b.Internt_Godkjent = %(internt)s and h.ATC_kode is %(value)s;"""
 
-    for a in req:
-        value = {"id":None,"innhold": a}
-        cur.execute(query, value)
-        conn.commit()
+    queryValues = {"date_string": '%d.%m.%y', "eksternt": False, "internt": True, "value": None}
 
-    return "done"
+    cur.execute(query, queryValues)
+    
+    res = cur.fetchall()
+
+    o = []
+
+    for x in res:
+        o.append({
+            "ATC_kode": x[0],
+            "Dato": x[1],
+            "VersjonsNr": x[2],
+            "ATC_VNR": x[3],
+            "Virkestoff": x[4],
+            "Status": "Kan sendes"
+        })
+
+    return jsonify(o),200
+
+@app.route('/api/hoering/lmuer', methods=['GET'])
+@jwt_required
+def getLMUer():
+
+    cur = connectDB()[0]
+
+    query = "SELECT * FROM LMUer"
+    cur.execute(query)
+
+    res = cur.fetchall()
+    o = []
+    for x in res:
+        o.append({
+            "ID": x[0],
+            "Sted": x[1],
+            "Region": x[2],
+            "Sykehus": x[3]
+        })
+    return jsonify(o),200
+    
+
+@app.route('/api/hoering/sendkort', methods=['POST'])
+@admin_required
+def sendCardHoering():
+    if request.is_json:
+
+        req = request.get_json()
+        
+        conn = mysql.connect()
+        cur = conn.cursor()
+
+        date = datetime.datetime.now()
+        query = "INSERT INTO Hoering values (%(id)s, Date(%(date)s), %(godkjent)s, %(lmuID)s, %(atckode)s)"
+
+        queryValues = {"id": None, "date": date.strftime('%Y-%m-%dT%H:%M:%S'), "godkjent": None, "lmuID": req.get('lmuID'), "atckode": req.get('atckode')}
+
+        cur.execute(query, queryValues)
+        
+        conn.commit() 
+
+        return jsonify("Høring lagt til"),201
+    return jsonify("Feil format"), 400
+
+
+# #Add item to table
+# @app.route('/add/innhold/<table>', methods=['POST'])
+# def leggTil(table):
+    # tabell = table
+    # req = request.get_json()
+
+    # conn = mysql.connect()
+    # cur = conn.cursor()
+
+    # query = "Insert into "
+    # query += tabell
+    # query += " values (%(id)s,%(innhold)s)"
+    # value = ""
+
+    # for a in req:
+    #     value = {"id":None,"innhold": a}
+    #     cur.execute(query, value)
+    #     conn.commit()
+
+    # return "done"
 
 
 
