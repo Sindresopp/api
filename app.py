@@ -189,7 +189,7 @@ def getActive():
                 inner join Preparat as p on p.ATC_kode=b.ATC_kode 
                 where b.Aktivt = %(true)s
                 group by v.VirkeStoffNavn,p.ATC_kode,b.ATC_VNR, b.Dato, b.VersjonsNr"""
-    values = {"string":"%d.%m.%Y","true": True}
+    values = {"string":"%Y.%m.%d","true": True}
     cur.execute(query, values)
     res = cur.fetchall()
     o = []
@@ -198,25 +198,26 @@ def getActive():
         o.append({
             "ATC_kode":x[0],
             "Virkestoff":x[1],
-            "Dato":x[2],
+            "Dato": x[2],
             "VersjonsNr":x[3],
             "ATC_VNR": x[4],
             "Handelsnavn": a
         })
+        print(x[2])
     return jsonify(o), 200
 
 #Get revisions of a blandekort
 
-@app.route('/api/blandekort/revisjoner/<atc_kode>', methods=['GET'])
-def getRevision(atc_kode):
+@app.route('/api/blandekort/revisjoner', methods=['GET'])
+def getRevision():
 
     conn = mysql.connect()
     cur = conn.cursor()
 
     query = """SELECT b.ATC_kode, date_format(b.dato, %(string)s), b.VersjonsNr, b.ATC_VNR, v.VirkeStoffNavn FROM Blandekort as b 
                inner join Virkestoff as v on v.ATC_kode = b.ATC_kode
-               WHERE b.Aktivt = %(bool)s AND b.Eksternt_Godkjent = %(god)s AND b.ATC_kode = %(atckode)s"""
-    values = {"string": "%d.%m.%Y","bool": False, "god":True ,"atckode":atc_kode}
+               WHERE b.Aktivt = %(bool)s AND b.Eksternt_Godkjent = %(god)s"""
+    values = {"string": "%d.%m.%Y","bool": False, "god":True }
 
     cur.execute(query,values)
 
