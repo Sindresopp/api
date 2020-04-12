@@ -385,6 +385,50 @@ def updateGodkjenn():
     return jsonify("Forespørselen er feil"), 400
 
 
+#Make new blandekort
+@app.route('/api/blandekort/opprett', methods=['POST'])
+@admin_required
+def makeNewBlandekort():
+    if request.is_json:
+
+        conn = mysql.connect()
+        cur = conn.cursor()
+        user = get_jwt_identity()
+        userID = getUserIDByName(user, cur)
+
+        now = datetime.datetime.now()
+        req = request.get_json()        
+        blandekortData = req.get('Blandekortdata')
+       
+        jsondum = json.dumps(blandekortData)
+        query ="INSERT INTO Blandekort values (%(atcvnr)s,%(atckode)s,%(brukerID)s,%(VersjonsNr)s,Date(%(date)s),%(internt)s,%(eksternt)s,%(aktivt)s,%(brukerID_A)s,%(blandekortdata)s,%(fortynning)s)"
+        
+        queryValues = {
+            "atcvnr": req.get('ATC_VNR'),
+            "atckode": req.get('ATC_kode'),
+            "brukerID": userID,
+            "VersjonsNr": req.get('VersjonsNr'),
+            "date": now.strftime('%Y-%m-%dT%H:%M:%S'),
+            "internt": req.get('Internt_Godkjent'),
+            "eksternt": req.get('Eksternt_Godkjent'),
+            "aktivt": req.get('aktivt'),
+            "brukerID_A": None,
+            "blandekortdata": jsondum,
+            "fortynning": None
+            }
+        
+        cur.execute(query, queryValues)
+        conn.commit()
+        
+        gQuery = "INSERT INTO Godkjent values (%(id)s,null,null,null,null,null,null,%(atcvnr)s)"
+        gQueryValues = {
+            "id":None,
+            "atcvnr": req.get('ATC_VNR')
+        }
+        cur.execute(gQuery,gQueryValues)
+        conn.commit()
+
+        return jsonify("Success"),201
 #
 # Spørringer for tabeller 
 #

@@ -24,7 +24,7 @@
             {"Styrke1":
                 {
                 "Volum":10,
-                "Malleenhet":"mg/ml",
+                "Maaleenhet":"mg/ml",
                 "Form": "inj.væske",
                 "Beholder": ["Ampulle","Hettglass"],
                 "Stamlosning":10,
@@ -36,7 +36,7 @@
             {"Styrke2":
                 {
                 "Volum":50,
-                "Malleenhet":"mg/ml",
+                "Maaleenhet":"mg/ml",
                 "Form": "inj.væske",
                 "Beholder": ["Ampulle","Hettglass"],
                 "Stamlosning": {"Stamvolum":10,
@@ -47,17 +47,14 @@
                 "Stamfrase": "hei stamløsning"
                 }
             },
-            {"Videre fortynning":
-                {"Ufortynnet": true,
-                 "fortynnes": true,
-                 "Fortynningsvæske":"NaCl 9 mg/ml",
-                 "Konsentrasjon": {
-                     "Frase": "Anbefalt makskonsentrasjon v/ perifer administrasjon",
-                     "volum": "10 mg/ml"
+            {"Viderefortynning":
+                {"vfValg":"Gis ufortynnet",
+                 "vfVaeske":"NaCl 9 mg/ml",
+                 "loesning": {
+                     "fLoesning": "Anbefalt makskonsentrasjon v/ perifer administrasjon",
+                     "fTillegg": "10 mg/ml"
                     },
-                 "Tillegsfraser": {
-                     "Frase1": "Hei"
-                    }
+                 "vfTillegg": ["Vend Forsiktig ikke rist","Dette har blitt endret"]
                 }
                 
             },
@@ -69,14 +66,14 @@
             },
             {"Administrasjon": {
                 "Admin1": {
-                    "Metode": "IV injeksjon",
-                    "Metodetillegg": "Over 3-5 minutter"
+                    "adminTid": "IV injeksjon",
+                    "adminTillegg": "Over 3-5 minutter"
                     },
                 "Admin2": {
-                    "Metode": "IV infusjon",
-                    "Metodetillegg": "Over 30-60 minutter"
+                    "adminTid": "IV infusjon",
+                    "adminTillegg": "Over 30-60 minutter"
                     },
-                "Tilleggsfrase": ""
+                "Tilleggsfrase": [""]
                 }
             },
             {"Admin_fraser":{
@@ -88,11 +85,13 @@
             {"Holdbarhet":{
                 "Form1": {
                     "Form": "Stamløsing",
-                    "Oppbevaring": ["6 timer i RT","24 timer i KJ"]
+                    "Oppbevaring1": "6 timer i RT",
+                    "Oppbevaring2": "24 timer i KJ"
                     },
                 "Form2": {
                     "Form": "Fortynnet løsning",
-                    "Oppbevaring": ["12 timer i RT","24 timer i KJ"]
+                    "Oppbevaring1": "Engangsbruk",
+                    "Oppbevaring2": null
                     }
                 }
 
@@ -105,9 +104,9 @@
 
             },
             {"Merknader": {
-                "Tromboflebitt": true,
+                "Tromboflebitt": "OBS! Tromboflebitt",
                 "Antidot": {
-                    "true/false": true,
+                    "Antidot": "Antidot",
                     "Tekst": "Fritekst"
                     },
                 "Bivirkninger":["Depresjon","Hallusinasjoner"],
@@ -121,9 +120,9 @@
                 }
             },
             {"Tilleggsopplysninger":{
-                "Stjerneanmerkning": "",
-                "Fritekst": "",
-                "Y-settforlikelige_væsker": "En frase"
+                "tilleggsInfo": "",
+                "stjerneAnm": "",
+                "YSV": "En frase"
                 }
             },
             {"Tilleggs_fraser":{
