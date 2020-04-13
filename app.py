@@ -1,4 +1,5 @@
 import uuid
+import simplejson as jsonfun
 import os
 import requests
 from functools import wraps
@@ -175,7 +176,7 @@ def blandekort():
                   "Internt_Godkjent":x[9],
                   "Eksternt_Godkjent":x[10],
                   "Aktivt":x[11]})
-    return jsonify(o), 200
+    return jsonfun.dumps(o), 200
 
 #Get acitve cards
 @app.route('/api/aktiveBlandekort', methods=['GET'])
@@ -203,8 +204,8 @@ def getActive():
             "ATC_VNR": x[4],
             "Handelsnavn": a
         })
-        print(x[2])
-    return jsonify(o), 200
+    response = jsonfun.dumps(o)
+    return response, 200
 
 #Get revisions of a blandekort
 
@@ -334,7 +335,7 @@ def getCardForGodkjenning():
         })
     return jsonify(o), 200
 
-#Update blandekort 
+#Update godkjenne blandekort 
 @app.route('/api/blandekort/updateGodkjenne', methods=['POST'])
 @jwt_required
 def updateGodkjenn():
@@ -443,7 +444,8 @@ def getStotteTables():
     tables = ["Beholder", 
               "Maaleenhet", 
               "Form",
-              "Fraser_Stamloesning", 
+              "Fraser_Stamloesning",
+              "Stamloesning_tillegg", 
               "Valg_vfortynning", 
               "Loesning_vfortynning", 
               "L_VF_tillegg", 
@@ -496,7 +498,7 @@ def getCardHoering():
                 from Blandekort as b 
                 inner join Virkestoff as v on v.ATC_kode = b.ATC_kode 
                 left join Hoering as h on h.ATC_kode = b.ATC_kode 
-                where b.Eksternt_godkjent = %(eksternt)s and b.Internt_Godkjent = %(internt)s and h.ATC_kode is %(value)s;"""
+                where b.Eksternt_godkjent = %(eksternt)s and b.Internt_Godkjent = %(internt)s and h.ATC_kode is %(value)s and b.VersjonsNr < 1;"""
 
     queryValues = {"date_string": '%d.%m.%y', "eksternt": False, "internt": True, "value": None}
 
@@ -550,9 +552,9 @@ def sendCardHoering():
         cur = conn.cursor()
 
         date = datetime.datetime.now()
-        query = "INSERT INTO Hoering values (%(id)s, Date(%(date)s), %(godkjent)s, %(lmuID)s, %(atckode)s)"
+        query = "INSERT INTO Hoering values (%(id)s, Date(%(date)s), %(godkjent)s, %(lmuID)s, %(atckode)s, %(brukerID)s)"
 
-        queryValues = {"id": None, "date": date.strftime('%Y-%m-%dT%H:%M:%S'), "godkjent": None, "lmuID": req.get('lmuID'), "atckode": req.get('atckode')}
+        queryValues = {"id": None, "date": date.strftime('%Y-%m-%dT%H:%M:%S'), "godkjent": None, "lmuID": req.get('lmuID'), "atckode": req.get('atckode'), "brukerID":None}
 
         cur.execute(query, queryValues)
         
@@ -561,6 +563,59 @@ def sendCardHoering():
         return jsonify("Høring lagt til"),201
     return jsonify("Feil format"), 400
 
+# Hent kort som er sendt på høring
+@app.route('/api/hoering/sendtekort', methods=['GET'])
+@jwt_required
+def getSendtCards():
+
+    cur = connectDB()[0]
+
+    query= """  select date_format(h.Dato_sendt,%(date_string)s), b.ATC_kode, date_format(b.dato,%(date_string)s), v.VirkeStoffNavn, l.Sykehus,l.Region, b.ATC_VNR, b.VersjonsNr From Hoering as h
+                inner join Blandekort as b on b.ATC_kode = h.ATC_kode
+                inner join Virkestoff as v on v.ATC_kode = h.ATC_kode
+                inner join LMUer as l on l.LMU_ID = h.LMU_ID
+                where Dato_godkjent is null and b.Eksternt_godkjent = false;"""
+    queryValues = {"date_string": '%d.%m.%y'}
+
+    cur.execute(query,queryValues)
+    res = cur.fetchall()
+
+    o = []
+
+    for x in res:
+        o.append({
+            "Dato_sendt": x[0],
+            "Dato_revidert": x[2],
+            "ATC_kode": x[1],
+            "Virkestoff": x[3],
+            "Mottaker": x[5]+" ved "+ x[4],
+            "ATC_VNR": x[6],
+            "VersjonsNr": x[7]
+        })
+    return jsonify(o), 200
+
+@app.route('/api/hoering/sendtekort', methods=['POST'])
+@jwt_required
+def setCardApproved():
+    if not request.is_json:
+        return 400
+    conn = mysql.connect()
+    cur = conn.cursor()
+    req = request.get_json()
+    userID = getUserIDByName(get_jwt_identity(),cur)
+
+    
+    query = "UPDATE Hoering SET Dato_godkjent = Date(%(date)s), BrukerID_Godkjent = %(userID)s where ATC_kode = %(atckode)s;"
+    queryValues = {"date": datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), "userID":userID, "atckode": req.get('atckode')}
+
+    cur.execute(query, queryValues)
+    conn.commit()
+    queryG = "UPDATE Blandekort set Eksternt_Godkjent = %(bool)s where ATC_VNR = %(atcvnr)s"
+    queryValuesG = {"bool": True, "atcvnr": req.get('atcvnr')}
+
+    cur.execute(queryG,queryValuesG)
+    conn.commit()
+    return jsonify("Blandekort godkjent"), 200
 
 # #Add item to table
 @app.route('/add/innhold/<table>', methods=['POST'])
