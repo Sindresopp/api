@@ -1,9 +1,7 @@
 [
-    "NaCl 9 mg/ml, glukose 50 mg/ml og blandinger av disse, ev. tilsatt inntil 30 mmol KCl/liter",
-"NaCl 9 mg/ml, glukose 50-x mg/ml og blandinger av disse, ev. tilsatt inntil 30 mmol KCl/liter x = 100, 200 eller 300",
-"Kun glukose 50 mg/ml",
-"Kun glukose 50-100 mg/ml" ,
-"Kun glukose 50-200 mg/ml." ,
-"NaCl 9 mg/ml",
-"Angående forlikelighet med andre elektrolytter i samme infusjonsvæske- se blandbarhetstabell. Vurder administrasjon via sentral inngang ved utblanding i glukose sterkere enn 100 mg/ml, pga. tromboflebittfare"
-]
+    "Sterilt vann tilsettes sakte langs veggen av hetteglasset for å unngå skumdannelse.",
+    "Ristes kraftig",
+    "Rotér forsiktig, ikke rist", 
+    "Vend forsiktig, ikke rist",
+    "La stå i opptil x minutter"  
+    ]

@@ -81,14 +81,16 @@ def createToken():
 
         return make_response(jsonify({"message": "Request body must be JSON"}), 400)
 
-#Get all virkestoff
+#Hent alle virkstoff som ikke har vært på høring
 @app.route('/api/virkestoff', methods=["GET"])
 @jwt_required
 def virkestoff():
     conn = mysql.connect()
     cur = conn.cursor()
     
-    query = "SELECT * FROM Virkestoff ORDER BY VirkeStoffNavn"
+    query = """ select v.ATC_kode, v.VirkeStoffNavn from Virkestoff as v 
+                left join Blandekort as b on b.ATC_kode = v.ATC_kode
+                where b.ATC_kode is null; """
 
     cur.execute(query)
 
@@ -217,7 +219,7 @@ def getRevision():
 
     query = """SELECT b.ATC_kode, date_format(b.dato, %(string)s), b.VersjonsNr, b.ATC_VNR, v.VirkeStoffNavn FROM Blandekort as b 
                inner join Virkestoff as v on v.ATC_kode = b.ATC_kode
-               WHERE b.Aktivt = %(bool)s AND b.Eksternt_Godkjent = %(god)s"""
+               WHERE (b.Aktivt = %(bool)s or b.Aktivt is null) AND b.Eksternt_Godkjent = %(god)s"""
     values = {"string": "%d.%m.%Y","bool": False, "god":True }
 
     cur.execute(query,values)
@@ -610,13 +612,47 @@ def setCardApproved():
 
     cur.execute(query, queryValues)
     conn.commit()
-    queryG = "UPDATE Blandekort set Eksternt_Godkjent = %(bool)s where ATC_VNR = %(atcvnr)s"
-    queryValuesG = {"bool": True, "atcvnr": req.get('atcvnr')}
+    queryG = "UPDATE Blandekort set Eksternt_Godkjent = %(bool)s, VersjonsNr = %(versjon)s where ATC_VNR = %(atcvnr)s"
+    queryValuesG = {"bool": True, "versjon":1.0, "atcvnr": req.get('atcvnr')}
 
     cur.execute(queryG,queryValuesG)
     conn.commit()
     return jsonify("Blandekort godkjent"), 200
 
+
+#Status høringer
+@app.route('/api/hoering/status', methods=['GET'])
+@jwt_required
+def getStatusHoering():
+
+    cur = connectDB()[0]
+
+    query = """ select v.VirkeStoffNavn, h.ATC_kode, date_format(h.Dato_godkjent,%(date)s), l.Sykehus, l.Region, h.Dato_sendt from Hoering as h
+                inner join Virkestoff as v on v.ATC_kode = h.ATC_kode
+                inner join LMUer as l on l.LMU_ID = h.LMU_ID;"""
+    queryValues = {"date":'%Y.%m.%d'}
+    cur.execute(query, queryValues)
+
+    res = cur.fetchall()
+
+    o = []
+    print(res)
+    for x in res:
+        if x[2] is None:
+            status = "På høring"
+
+        else:
+            status = "Godkjent"
+        
+        o.append({
+            "Virkestoff": x[0],
+            "ATC_kode": x[1],
+            "Dato_godkjent": x[2],
+            "Mottaker": x[4]+" ved "+ x[3],
+            "Status": status
+        })
+
+    return jsonify(o), 200
 # #Add item to table
 @app.route('/add/innhold/<table>', methods=['POST'])
 def leggTil(table):
