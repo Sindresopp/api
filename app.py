@@ -653,6 +653,33 @@ def getStatusHoering():
         })
 
     return jsonify(o), 200
+
+#OVersikt LMU
+
+@app.route('/api/hoering/LMUoversikt', methods=['GET'])
+@jwt_required
+def getOversiktLMU():
+
+    cur = connectDB()[0]
+
+    query = """ select distinct l.Sykehus, l.Region, date_format(max(Dato_sendt),%(datestring)s) , count(h.Dato_sendt)
+                from Hoering as h
+                inner join LMUer as l on l.LMU_ID = h.LMU_ID
+                group by l.Sykehus, l.Region;"""
+    queryValues = {"datestring": '%Y.%m.%d'}
+    cur.execute(query, queryValues)
+    res = cur.fetchall()
+
+    o = []
+    for x in res:
+        o.append({
+            "LMU": x[0],
+            "Region": x[1],
+            "Siste": x[2],
+            "Antall": x[3]
+        })
+    return jsonify(o),200
+
 # #Add item to table
 @app.route('/add/innhold/<table>', methods=['POST'])
 def leggTil(table):

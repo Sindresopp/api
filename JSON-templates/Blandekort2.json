@@ -10,16 +10,11 @@
     {"Bruker_ID_A": 2},
     {"Blandekortdata":[
         
-            {"Preparat1": 
+        
+            {"PreparatTillegg":
                 {
-                "Handelsnavn": "Ketalar",
-                "Tillegg": ""
-                }
-            },
-            {"Preparat2":
-                {
-                "Handelsnavn": "Ketamin",
-                "Tillegg": "Abcur"
+                "Preparat": ["Ketamin","Ketalar"],
+                "Fritekst": "Abcur"
                 }},
             {"Styrke1":
                 {
