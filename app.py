@@ -474,7 +474,21 @@ def publiserBlandekort():
 
 
     if request.method == 'POST':
-        return jsonify("Post"),201
+
+        if not request.is_json:
+            return jsonify("Provide json"), 400
+        conn = mysql.connect()
+        cur = conn.cursor()
+        req = request.get_json()
+        atcvnr = req.get('atcvnr')
+        userID = getUserIDByName(get_jwt_identity(),cur)
+        query = "UPDATE Blandekort SET Aktivt = %(bool)s, Bruker_ID_A = %(userid)s where ATC_VNR = %(atcvnr)s"
+        queryValues = {"bool": True, "userid": userID, "atcvnr": atcvnr}
+
+        cur.execute(query, queryValues)
+        conn.commit()
+
+        return jsonify("Blandekort publisert"),201
 
 #Info om valgte publiser kort
 
@@ -788,6 +802,24 @@ def leggTil(table):
     return "done"
 
 
+#Hent lenker
+@app.route('/api/lenker', methods=['GET'])
+@jwt_required
+def getLenker():
 
+    cur = connectDB()[0]
+
+    query = "SELECT Navn, URL FROM Lenker"
+    cur.execute(query)
+    res = cur.fetchall()
+    if not res:
+        return jsonify("no content"), 204
+    o = []
+    for x in res:
+        o.append({
+            "Navn": x[0],
+            "URL": x[1]
+        })
+    return jsonify(o), 200  
 if __name__ == '__main__':
     app.run()
