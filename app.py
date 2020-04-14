@@ -195,8 +195,11 @@ def getActive():
     values = {"string":"%Y.%m.%d","true": True}
     cur.execute(query, values)
     res = cur.fetchall()
+    if not res:
+        return jsonify("No content"), 204
     o = []
     for x in res:
+        
         a = x[5].split(',')
         o.append({
             "ATC_kode":x[0],
@@ -225,7 +228,8 @@ def getRevision():
     cur.execute(query,values)
 
     res = cur.fetchall()
-
+    if not res:
+        return jsonify("no contetn"), 204
     o = []
     
     for x in res:
@@ -287,7 +291,7 @@ def getUtkast():
     res = cur.fetchall()
 
     if not res:
-        return 204
+        return jsonify("no content"),204
     o = []
     
     for x in res:
@@ -299,7 +303,7 @@ def getUtkast():
             "Virkestoff": x[4]
         })
 
-    return jsonify(o),200
+    return jsonfun.dumps(o),200
 
 #Get all cards for godkjenning
 @app.route('/api/blandekort/godkjenne', methods=['GET'])
@@ -432,6 +436,88 @@ def makeNewBlandekort():
         conn.commit()
 
         return jsonify("Success"),201
+
+#Publiser blandekort 
+@app.route('/api/blandekort/publiser', methods=['GET','POST'])
+@jwt_required
+def publiserBlandekort():
+    if request.method == 'GET':
+
+       
+        cur = connectDB()[0]
+
+        query = """ select v.VirkeStoffNavn, b.ATC_kode, date_format(g.Dato_3,%(datestring)s), b.VersjonsNr, b.ATC_VNR from Blandekort as b
+                    inner join Virkestoff as v on v.ATC_kode = b.ATC_kode
+                    inner join Godkjent as g on g.ATC_VNR = b.ATC_VNR
+                    where b.Aktivt = %(aktivt)s and b.Internt_Godkjent = %(internt)s and b.Eksternt_godkjent = %(eksternt)s;"""
+        queryValues = {"datestring": '%Y.%m.%d', "aktivt": False, "internt":True, "eksternt":True}
+
+        cur.execute(query, queryValues)
+        res = cur.fetchall()
+
+        if not res:
+            return jsonify('no content'),204
+
+        o = []
+
+        for x in res:
+            o.append({
+                "Virkestoff": x[0],
+                "ATC_kode": x[1],
+                "Dato_godkjent": x[2],
+                "VersjonsNr": x[3],
+                "ATC_VNR": x[4]
+            })    
+
+        return jsonify(o),200
+
+
+
+    if request.method == 'POST':
+        return jsonify("Post"),201
+
+#Info om valgte publiser kort
+
+@app.route('/api/blandekort/infopub', methods=['GET'])
+@jwt_required
+def getInfoCard():
+
+    atcvnr = request.args.get('atcvnr', None)
+    atckode = request.args.get('atckode', None)
+
+    if not atcvnr or not atckode:
+        return jsonify("Must specify args"),400
+    cur = connectDB()[0]
+    query = """     select et.Utarbeider, et.Godkjenner1, et.Godkjenner2, ar.VersjonsNr from
+            (select b1.Brukernavn as Utarbeider ,b2.Brukernavn as Godkjenner1 ,b3.Brukernavn as Godkjenner2, ATC_kode  from Godkjent g
+            inner join Bruker b1 on b1.Bruker_ID = g.Bruker_ID1
+            inner join Bruker b2 on b2.Bruker_ID = g.Bruker_ID2
+            inner join Bruker b3 on b3.Bruker_ID = g.Bruker_ID3
+            left join Blandekort b on b.ATC_VNR = g.ATC_VNR
+            where g.ATC_VNR = %(atcvnr)s) as et  
+            left join
+            (select VersjonsNr, ATC_kode from Blandekort b where b.Aktivt= true and b.ATC_kode = %(atckode)s) as ar
+            on (et.ATC_kode = ar.ATC_kode); """
+    queryValues = {"atcvnr": atcvnr, "atckode": atckode}
+
+    cur.execute(query, queryValues)
+    
+    res = cur.fetchall()
+    if not res:
+        return jsonify('no content'),204
+    
+    o= []
+    for x in res:
+        o.append({
+            "Utarbeider": x[0],
+            "Godkjenner1": x[1],
+            "Godkjenner2": x[2],
+            "VersjonsNr": x[3]
+        })
+
+    print(res)
+    return jsonify(o), 200
+
 #
 # Spørringer for tabeller 
 #
