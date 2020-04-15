@@ -1,4 +1,5 @@
 import uuid
+import xml.etree.cElementTree as Et
 import simplejson as jsonfun
 import os
 import requests
@@ -20,7 +21,7 @@ app.config.from_object(app_config)
 CORS(app)
 mysql = MySQL(app)
 jwt = JWTManager(app)
-
+#fest = Et.parse('./JSON-templates/fest25.xml')
 
 @jwt.user_claims_loader
 def add_claim_to_access_token(user):
@@ -30,12 +31,28 @@ def add_claim_to_access_token(user):
 def user_identity_lookup(user):
     return user.username
 
-@app.route('/',methods=['GET'])
-@jwt_required
-def checkID():
-    identity = get_jwt_identity()
-    role = get_jwt_claims()
-    return jsonify(identity, role)
+# @app.route('/',methods=['GET'])
+
+# def checkID():
+#     res = fest.getroot()
+    
+#     for l in res.findall('KatLegemiddelMerkevare/OppfLegemiddelMerkevare/{http://www.kith.no/xmlstds/eresept/forskrivning/2013-10-08}LegemiddelMerkevare'):
+#         print(l.attrib)
+#         for i in l:
+#             print(i.tag)
+
+#     # for child in res.iter('KatLegemiddelMerkevare'):
+#     #     for chi in child.iter('OppfLegemiddelMerkevare'):
+#     #         for i in chi.iter('{http://www.kith.no/xmlstds/eresept/forskrivning/2013-10-08}LegemiddelMerkevare'):
+                
+#     #             for x in i:
+                    
+#     #                 if x.tag == '{http://www.kith.no/xmlstds/eresept/forskrivning/2013-10-08}Atc':
+#     #                     print(x.attrib.get('V'))
+#     #                 if x.tag =='{http://www.kith.no/xmlstds/eresept/forskrivning/2013-10-08}Varenavn':
+#     #                     print(x.tag)
+#     #     print(child.attrib)
+#     return res.tag
 
 
 #Conect to DB and returns cursor
@@ -282,7 +299,7 @@ def getUtkast():
     query = """SELECT b.ATC_kode, date_format(b.dato, %(string)s), b.VersjonsNr, b.ATC_VNR, v.VirkeStoffNavn FROM Blandekort as b 
                inner join Godkjent as g on g.ATC_VNR = b.ATC_VNR
                inner join Virkestoff as v on v.ATC_kode = b.ATC_kode
-               where g.Bruker_ID1 IS NULL"""
+               where g.Bruker_ID1 IS NULL AND g.Bruker_ID2 IS NULL"""
 
     values = {"string": "%d.%m.%Y"}
     
@@ -309,37 +326,59 @@ def getUtkast():
 @app.route('/api/blandekort/godkjenne', methods=['GET'])
 @jwt_required
 def getCardForGodkjenning():
+    
+        conn = mysql.connect()
+        cur = conn.cursor()
+
+        query = """select  b.ATC_kode, date_format(g.Dato_1, %(string)s), b.VersjonsNr, b.ATC_VNR, v.VirkeStoffNavn, br.Brukernavn, bru.Brukernavn  from Blandekort as b 
+                inner join Godkjent as g on g.ATC_VNR = b.ATC_VNR 
+                inner join Virkestoff as v on v.ATC_kode=b.ATC_kode
+                inner join Bruker as br on br.Bruker_ID = g.Bruker_ID1
+                left join Bruker as bru on bru.Bruker_ID = g.Bruker_ID2 and g.Bruker_ID2 is not null
+                where g.Bruker_ID1 is not null and (g.Bruker_ID2 is null or g.Bruker_ID3 is null);"""
+        values = {"string": "%d.%m.%Y"}
+        cur.execute(query, values)
+
+        res = cur.fetchall()
+
+        if not res:
+            return jsonify("Ingen kort til godkjenning"), 204
+        
+        o = []
+        cur.close()
+        for x in res:
+            o.append({
+                "ATC_kode": x[0],
+                "DatoSendt": x[1],
+                "VersjonsNr": x[2],
+                "ATC_VNR": x[3],
+                "Virkestoff": x[4],
+                "SendtAv": x[5],
+                "ForsteGod": x[6]
+            })
+        return jsonify(o), 200
+
+#Regret send to godkjenning
+@app.route('/api/blandekort/regret/<atcvnr>', methods=['PUT'])
+@admin_required
+def deleteGodkjent(atcvnr):
 
     conn = mysql.connect()
     cur = conn.cursor()
+   # check if exists
+    query = "SELECT * FROM Godkjent WHERE ATC_VNR = %(atcvnr)s"
+    queryValues = {"atcvnr": atcvnr}
 
-    query = """select  b.ATC_kode, date_format(g.Dato_1, %(string)s), b.VersjonsNr, b.ATC_VNR, v.VirkeStoffNavn, br.Brukernavn, bru.Brukernavn  from Blandekort as b 
-               inner join Godkjent as g on g.ATC_VNR = b.ATC_VNR 
-               inner join Virkestoff as v on v.ATC_kode=b.ATC_kode
-               inner join Bruker as br on br.Bruker_ID = g.Bruker_ID1
-               left join Bruker as bru on bru.Bruker_ID = g.Bruker_ID2 and g.Bruker_ID2 is not null
-               where g.Bruker_ID1 is not null and (g.Bruker_ID2 is null or g.Bruker_ID3 is null);"""
-    values = {"string": "%d.%m.%Y"}
-    cur.execute(query, values)
-
-    res = cur.fetchall()
-
+    cur.execute(query, queryValues)
+    res = cur.fetchone()
     if not res:
-        return jsonify("Ingen kort til godkjenning"), 204
-    
-    o = []
+        return jsonify("no content"), 404
+    queryDelete = "UPDATE Godkjent SET Bruker_ID1 = null, Dato_1 = null, Bruker_ID2 = null,Dato_2 = null WHERE ATC_VNR = %(atcvnr)s"
 
-    for x in res:
-        o.append({
-            "ATC_kode": x[0],
-            "DatoSendt": x[1],
-            "VersjonsNr": x[2],
-            "ATC_VNR": x[3],
-            "Virkestoff": x[4],
-            "SendtAv": x[5],
-            "ForsteGod": x[6]
-        })
-    return jsonify(o), 200
+    cur.execute(queryDelete, queryValues)
+    conn.commit()
+
+    return jsonify("Updated"), 200
 
 #Update godkjenne blandekort 
 @app.route('/api/blandekort/updateGodkjenne', methods=['POST'])
@@ -736,7 +775,7 @@ def getStatusHoering():
     res = cur.fetchall()
 
     o = []
-    print(res)
+
     for x in res:
         if x[2] is None:
             status = "På høring"
