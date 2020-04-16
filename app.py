@@ -77,7 +77,7 @@ def createToken():
 
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute("select Brukernavn, IF(isAdmin,%(true)s, %(false)s)isAdmin from Bruker where azure_ID = %(user)s", {'user': userCheck, 'true': "true", 'false': "false"})
+        cur.execute("select Brukernavn, IF(isAdmin,%(true)s, %(false)s)isAdmin from Bruker where Brukernavn = %(user)s", {'user': userCheck, 'true': "true", 'false': "false"})
         if cur.rowcount != 1:
             return {"denied":"No user found"}, 400
 
