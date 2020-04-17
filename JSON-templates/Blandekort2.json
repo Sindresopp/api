@@ -46,8 +46,15 @@
                 {"vfValg":"Gis ufortynnet",
                  "vfVaeske":"NaCl 9 mg/ml",
                  "loesning": {
-                     "fLoesning": "Anbefalt makskonsentrasjon v/ perifer administrasjon",
-                     "fTillegg": "10 mg/ml"
+                     "losning1":{
+                            "fLoesning": "Anbefalt makskonsentrasjon v/ perifer administrasjon",
+                            "fTillegg": "10 mg/ml"
+                     },
+                     "loesning2": {
+                            "fLoesning": "Anbefalt makskonsentrasjon v/ perifer administrasjon",
+                            "fTillegg": "10 mg/ml"
+                     }
+                     
                     },
                  "vfTillegg": ["Vend Forsiktig ikke rist","Dette har blitt endret"]
                 }

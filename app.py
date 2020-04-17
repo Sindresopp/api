@@ -753,7 +753,7 @@ def getStatusHoering():
     query = """ select v.VirkeStoffNavn, h.ATC_kode, date_format(h.Dato_godkjent,%(date)s), l.Sykehus, l.Region, h.Dato_sendt from Hoering as h
                 inner join Virkestoff as v on v.ATC_kode = h.ATC_kode
                 inner join LMUer as l on l.LMU_ID = h.LMU_ID;"""
-    queryValues = {"date":'%d.%m.%Y'}
+    queryValues = {"date":'%Y.%m.%d'}
     cur.execute(query, queryValues)
 
     res = cur.fetchall()
