@@ -177,6 +177,7 @@ def blandekort():
                   "Internt_Godkjent":x[9],
                   "Eksternt_Godkjent":x[10],
                   "Aktivt":x[11]})
+    cur.close()
     return jsonfun.dumps(o), 200
 
 #Get acitve cards
@@ -209,6 +210,7 @@ def getActive():
             "Handelsnavn": a
         })
     response = jsonfun.dumps(o)
+    cur.close()
     return response, 200
 
 #Get revisions of a blandekort
@@ -240,7 +242,7 @@ def getRevision():
             "ATC_VNR": x[3],
             "Virkestoff": x[4]
         })
-
+    cur.close()
     return jsonify(o), 200
 
 #Send blandekort to approvel
@@ -303,7 +305,7 @@ def getUtkast():
             "ATC_VNR": x[3],
             "Virkestoff": x[4]
         })
-
+    cur.close()
     return jsonfun.dumps(o),200
 
 #Get all cards for godkjenning
@@ -361,7 +363,7 @@ def deleteGodkjent(atcvnr):
 
     cur.execute(queryDelete, queryValues)
     conn.commit()
-
+    cur.close()
     return jsonify("Updated"), 200
 
 #Update godkjenne blandekort 
@@ -397,6 +399,7 @@ def updateGodkjenn():
 
             cur.execute(query, queryValues)
             conn.commit()
+            cur.close()
             return jsonify("Godkjent tabell oppdatert"), 200
 
         if req.get('ForsteGod'):
@@ -404,12 +407,12 @@ def updateGodkjenn():
             queryValues = {"user": userID, "date":dateNow.strftime('%Y-%m-%dT%H:%M:%S'), "atcvnr": ATC_VNR }
             
             cur.execute( query, queryValues)
-            conn.commit()
 
             updateCardQuery = " UPDATE Blandekort SET Internt_Godkjent = %(bool)s WHERE ATC_VNR = %(atcvnr)s "
             updateCardValues = {"bool": True, "atcvnr": ATC_VNR}
             cur.execute(updateCardQuery,updateCardValues)
             conn.commit()
+            cur.close()
             return jsonify("Blandekort ferdig godkjent"),200
 
     return jsonify("Forespørselen er feil"), 400
@@ -448,7 +451,7 @@ def makeNewBlandekort():
             }
         
         cur.execute(query, queryValues)
-        conn.commit()
+        
         
         gQuery = "INSERT INTO Godkjent values (%(id)s,null,null,null,null,null,null,%(atcvnr)s)"
         gQueryValues = {
@@ -457,7 +460,7 @@ def makeNewBlandekort():
         }
         cur.execute(gQuery,gQueryValues)
         conn.commit()
-
+        cur.close()
         return jsonify("Success"),201
 
 #Publiser blandekort 
@@ -472,7 +475,7 @@ def publiserBlandekort():
         query = """ select v.VirkeStoffNavn, b.ATC_kode, date_format(g.Dato_3,%(datestring)s), b.VersjonsNr, b.ATC_VNR from Blandekort as b
                     inner join Virkestoff as v on v.ATC_kode = b.ATC_kode
                     inner join Godkjent as g on g.ATC_VNR = b.ATC_VNR
-                    where b.Aktivt = %(aktivt)s and b.Internt_Godkjent = %(internt)s and b.Eksternt_godkjent = %(eksternt)s;"""
+                    where (b.Aktivt = %(aktivt)s or b.Aktivt is null) and b.Internt_Godkjent = %(internt)s and b.Eksternt_godkjent = %(eksternt)s;"""
         queryValues = {"datestring": '%Y.%m.%d', "aktivt": False, "internt":True, "eksternt":True}
 
         cur.execute(query, queryValues)
@@ -491,7 +494,7 @@ def publiserBlandekort():
                 "VersjonsNr": x[3],
                 "ATC_VNR": x[4]
             })    
-
+        cur.close()
         return jsonify(o),200
 
 
@@ -510,7 +513,7 @@ def publiserBlandekort():
 
         cur.execute(query, queryValues)
         conn.commit()
-
+        cur.close()
         return jsonify("Blandekort publisert"),201
 
 #Info om valgte publiser kort
@@ -553,6 +556,7 @@ def getInfoCard():
         })
 
     print(res)
+    cur.close()
     return jsonify(o), 200
 
 #
@@ -593,7 +597,7 @@ def getStotteTables():
       res = cur.fetchall()
       o.append({x:res})
 
-
+    cur.close()
     return jsonify(o), 200
 
 
@@ -642,7 +646,7 @@ def getCardHoering():
             "Virkestoff": x[4],
             "Status": "Kan sendes"
         })
-
+    cur.close()
     return jsonify(o),200
 
 @app.route('/api/hoering/lmuer', methods=['GET'])
@@ -663,6 +667,7 @@ def getLMUer():
             "Region": x[2],
             "Sykehus": x[3]
         })
+    cur.close()
     return jsonify(o),200
     
 
@@ -684,7 +689,7 @@ def sendCardHoering():
         cur.execute(query, queryValues)
         
         conn.commit() 
-
+        cur.close()
         return jsonify("Høring lagt til"),201
     return jsonify("Feil format"), 400
 
@@ -717,6 +722,7 @@ def getSendtCards():
             "ATC_VNR": x[6],
             "VersjonsNr": x[7]
         })
+    cur.close()
     return jsonify(o), 200
 
 @app.route('/api/hoering/sendtekort', methods=['POST'])
@@ -740,6 +746,7 @@ def setCardApproved():
 
     cur.execute(queryG,queryValuesG)
     conn.commit()
+    cur.close()
     return jsonify("Blandekort godkjent"), 200
 
 
@@ -774,7 +781,8 @@ def getStatusHoering():
             "Mottaker": x[4]+" ved "+ x[3],
             "Status": status
         })
-
+    
+    cur.close()
     return jsonify(o), 200
 
 #OVersikt LMU
@@ -801,6 +809,8 @@ def getOversiktLMU():
             "Siste": x[2],
             "Antall": x[3]
         })
+    
+    cur.close()
     return jsonify(o),200
 
 # #Add item to table
@@ -823,6 +833,7 @@ def leggTil(table):
         cur.execute(query, value)
         conn.commit()
 
+    cur.close()
     return "done"
 
 
@@ -844,6 +855,8 @@ def getLenker():
             "Navn": x[0],
             "URL": x[1]
         })
+
+    cur.close()
     return jsonify(o), 200  
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5000,ssl_context='adhoc')
