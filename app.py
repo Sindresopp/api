@@ -31,28 +31,10 @@ def add_claim_to_access_token(user):
 def user_identity_lookup(user):
     return user.username
 
-# @app.route('/',methods=['GET'])
+@app.route('/trustme',methods=['GET'])
+def trusMe():
 
-# def checkID():
-#     res = fest.getroot()
-    
-#     for l in res.findall('KatLegemiddelMerkevare/OppfLegemiddelMerkevare/{http://www.kith.no/xmlstds/eresept/forskrivning/2013-10-08}LegemiddelMerkevare'):
-#         print(l.attrib)
-#         for i in l:
-#             print(i.tag)
-
-#     # for child in res.iter('KatLegemiddelMerkevare'):
-#     #     for chi in child.iter('OppfLegemiddelMerkevare'):
-#     #         for i in chi.iter('{http://www.kith.no/xmlstds/eresept/forskrivning/2013-10-08}LegemiddelMerkevare'):
-                
-#     #             for x in i:
-                    
-#     #                 if x.tag == '{http://www.kith.no/xmlstds/eresept/forskrivning/2013-10-08}Atc':
-#     #                     print(x.attrib.get('V'))
-#     #                 if x.tag =='{http://www.kith.no/xmlstds/eresept/forskrivning/2013-10-08}Varenavn':
-#     #                     print(x.tag)
-#     #     print(child.attrib)
-#     return res.tag
+    return jsonify("Thanks for trusting me"),200
 
 
 #Conect to DB and returns cursor
@@ -77,7 +59,7 @@ def createToken():
 
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute("select Brukernavn, IF(isAdmin,%(true)s, %(false)s)isAdmin from Bruker where Brukernavn = %(user)s", {'user': userCheck, 'true': "true", 'false': "false"})
+        cur.execute("select Brukernavn, IF(isAdmin,%(true)s, %(false)s)isAdmin from Bruker where azure_ID = %(user)s", {'user': userCheck, 'true': "true", 'false': "false"})
         if cur.rowcount != 1:
             return {"denied":"No user found"}, 400
 
@@ -232,6 +214,7 @@ def getActive():
 #Get revisions of a blandekort
 
 @app.route('/api/blandekort/revisjoner', methods=['GET'])
+@jwt_required
 def getRevision():
 
     conn = mysql.connect()
@@ -291,6 +274,7 @@ def sendToGodkjenning():
 
 #Get all utkast
 @app.route('/api/blandekort/utkast', methods=['GET'])
+@jwt_required
 def getUtkast():
 
     conn = mysql.connect()
@@ -769,7 +753,7 @@ def getStatusHoering():
     query = """ select v.VirkeStoffNavn, h.ATC_kode, date_format(h.Dato_godkjent,%(date)s), l.Sykehus, l.Region, h.Dato_sendt from Hoering as h
                 inner join Virkestoff as v on v.ATC_kode = h.ATC_kode
                 inner join LMUer as l on l.LMU_ID = h.LMU_ID;"""
-    queryValues = {"date":'%Y.%m.%d'}
+    queryValues = {"date":'%d.%m.%Y'}
     cur.execute(query, queryValues)
 
     res = cur.fetchall()
@@ -821,6 +805,7 @@ def getOversiktLMU():
 
 # #Add item to table
 @app.route('/add/innhold/<table>', methods=['POST'])
+@jwt_required
 def leggTil(table):
     tabell = table
     req = request.get_json()
@@ -861,4 +846,4 @@ def getLenker():
         })
     return jsonify(o), 200  
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0',port=5000,ssl_context='adhoc')
